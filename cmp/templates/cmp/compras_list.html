@@ -1,0 +1,104 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+
+<div class="card shadow mb-4">
+  <!-- Card Header - Dropdown -->
+  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-2 font-weight-bold text-info">Listado De Compras</h6>
+    <div class="dropdown no-arrow">
+      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+        <div class="dropdown-header">Acciones De Compras</div>
+        <a class="dropdown-item" href="{% url 'cmp:compras_new' %}"><i class=" fas fa-folder-plus "></i> Agregar </a>
+        <a class="dropdown-item" href="{% url 'cmp:compras_print_all' %}" target="reportes"><i class=" fas fa-print " ></i> Listado </a>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- Card Body -->
+  <div class="card-body">
+    {% if not obj %}
+    <div class="alert alert-info">No hay compras</div>
+    {% endif %}
+
+    <!-- Exportar Excel -->
+    <!-- <div class="buttons-toolbar">
+      <a class="dropdown-item" href="{% url 'cmp:compras_new' %}"><i class=" fas fa-folder-plus "></i> Agregar </a>
+      <a class="dropdown-item" href="{% url 'cmp:compras_print_all' %}" target="reportes"><i class=" fas fa-print " ></i> Listado </a>
+    </div> -->
+
+
+    <table id="table"
+    data-toggle="table"
+    data-pagination="true"
+    data-search="true"
+    data-show-columns="true"
+    data-show-toggle="true"
+    data-toolbar=".buttons-toolbar"
+    data-locale="es-HN"
+    data-show-export="true"
+    
+    >
+      <thead>
+        <th data-field="id" data-sortable="true" >Id</th>        
+        <th data-field="fecha_compra" data-sortable="true">Fecha</th>
+        <th data-field="observacion" >Observación</th>
+        <th data-field="no_factura" data-sortable="true" >N. Factura</th>
+        <th data-field="fecha_factura" data-sortable="true" >Fecha F.</th>
+        <th data-field="sub_total" >Sub T.</th>
+        <th data-field="descripcion" >Desc.</th>
+        <th data-field="total" >Total</th>
+        <th data-field="estado" >Estado</th>
+        <th class="all">Acciones</th>
+      </thead>
+      <tbody>
+        {% for item in obj%}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.fecha_compra | date:"d/m/Y" }}</td>
+          <td>{{item.observacion}}</td>
+          <td>{{ item.no_factura }}</td>
+          <td>{{ item.fecha_factura | date:"d/m/Y" }}</td>
+          <td>{{ item.sub_total }}</td>
+          <td>{{ item.descuento }}</td>
+          {% load humanize %}
+          <td>{{ item.total  }}</td>
+          
+          <td>{{item.estado|yesno:"Activo,Inactivo"}}</td>
+          <td>
+            <a class="btn btn-info btn-info" href="{% url 'cmp:compras_edit' item.id %}"><i class="far fa-edit"></i></a>
+            <a class="btn btn-success btn-success" href="{% url 'cmp:compras_print_one' item.id %}" target="reportes"><i class="fas fa-print"></i></a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+{% block js_page %}
+<script>
+// Call the dataTables jQuery plugin
+$(document).ready(function() {
+
+  $("#sidebarToggle").click();
+
+  var $table = $('#table')
+
+  $(function() {
+    $('#toolbar').find('select').change(function () {
+      $table.bootstrapTable('destroy').bootstrapTable({
+        exportDataType: $(this).val(),
+        exportTypes: [ 'txt', 'excel', 'pdf'],
+      })
+    }).trigger('change')
+  })
+
+});
+</script>
+{% endblock %}

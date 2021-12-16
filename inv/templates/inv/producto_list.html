@@ -1,0 +1,92 @@
+{% extends 'base/base.html' %}
+
+{% block page_content %}
+<div class="card shadow mb-4">
+  <!-- Card Header - Dropdown -->
+  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-2  font-weight-bold text-info ">Listado De Productos</h6>
+    <div class="dropdown no-arrow">
+      <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+        <div class="dropdown-header">Acciones Productos</div>
+        <a class="dropdown-item" onclick="return abrir_modal('{% url 'inv:producto_new' %}')" href="#"><i class=" fa fa-cart-plus "></i> Agregar</a>
+      </div>
+    </div>
+  </div>
+  <!-- Card Body -->
+  <div class="card-body">
+    {% if not obj %}
+    <div class="alert alert-info">No Hay Productos Disponibles</div>
+    {% endif %}
+    <table id="table"
+    data-toggle="table"
+    data-pagination="true"
+    data-search="true"
+    data-show-columns="true"
+    data-show-toggle="true"
+    data-toolbar=".buttons-toolbar"
+    data-locale="es-HN"
+    data-show-export="true"
+    
+    >
+      <thead>
+        <th data-field="subcategoria" data-sortable="true" >Sub Categoria</th>        
+        <th data-field="codigo" data-sortable="true" >Código</th>
+        <th data-field="Barra" >Barra</th>
+        <th data-field="descripcion" >Descripción</th>
+        <th data-field="existencia" >Existencia</th>
+        <th data-field="marca" data-sortable="true" >Marca</th>
+        <th data-field="unidad_medida" >Unidad Med.</th>
+        <th data-field="estado" >Estado</th>
+        <th class="all">Acciones</th>
+      </thead>
+      <tbody>
+        {% for item in obj%}
+        <tr>
+          <td>{{ item.subcategoria }}</td>
+          <td>{{ item.codigo }}</td>
+          <td>{{ item.codigo_barra }}</td>
+          <td>{{ item.descripcion }}</td>
+          <td>{{ item.existencia }}</td>
+          <td>{{ item.marca }}</td>
+          <td>{{ item.unidad_medida.descripcion }}</td>
+          <td>{{item.estado|yesno:"Activo,Inactivo"}}</td>
+          <td>
+            <button class="btn btn-info btn-info" onclick="return abrir_modal('{% url 'inv:producto_edit' item.id %}')">
+                <i class="far fa-edit"></i></button>
+                <button class="btn btn-info btn-light" onclick="return abrir_modal('{% url 'inv:producto_inactivar' item.id %}')">
+                  <i class="fas fa-toggle-off"></i>
+                </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+{% block js_page %}
+
+
+
+<script>
+  // Call the dataTables jQuery plugin
+  $(document).ready(function() {
+
+    $("#sidebarToggle").click();
+
+    var $table = $('#table')
+    $(function() {
+      $('#toolbar').find('select').change(function () {
+        $table.bootstrapTable('destroy').bootstrapTable({
+          exportDataType: $(this).val(),
+          exportTypes: [ 'txt', 'excel', 'pdf'],
+        })
+      }).trigger('change')
+    })
+
+  });
+  </script>
+{% endblock %}
